@@ -3,7 +3,7 @@ import logging
 from functools import partial
 
 import voluptuous as vol
-from homeassistant.components.sensor import DEVICE_CLASSES, DOMAIN, STATE_CLASS_MEASUREMENT, SensorEntity
+from homeassistant.components.sensor import DEVICE_CLASSES, DOMAIN
 from homeassistant.const import (
     CONF_DEVICE_CLASS,
     CONF_UNIT_OF_MEASUREMENT,
@@ -29,7 +29,7 @@ def flow_schema(dps):
     }
 
 
-class LocaltuyaSensor(LocalTuyaEntity, SensorEntity):
+class LocaltuyaSensor(LocalTuyaEntity):
     """Representation of a Tuya sensor."""
 
     def __init__(
@@ -47,11 +47,6 @@ class LocaltuyaSensor(LocalTuyaEntity, SensorEntity):
     def state(self):
         """Return sensor state."""
         return self._state
-    
-    @property
-    def state_class(self):
-        """Return longterm statistics."""
-        return STATE_CLASS_MEASUREMENT
 
     @property
     def device_class(self):

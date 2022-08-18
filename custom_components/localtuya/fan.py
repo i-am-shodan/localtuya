@@ -32,7 +32,6 @@ from .const import (
     CONF_FAN_SPEED_CONTROL,
     CONF_FAN_SPEED_MAX,
     CONF_FAN_SPEED_MIN,
-    CONF_FAN_DPS_TYPE
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,7 +48,6 @@ def flow_schema(dps):
         vol.Optional(CONF_FAN_SPEED_MIN, default=1): cv.positive_int,
         vol.Optional(CONF_FAN_SPEED_MAX, default=9): cv.positive_int,
         vol.Optional(CONF_FAN_ORDERED_LIST, default="disabled"): cv.string,
-        vol.Optional(CONF_FAN_DPS_TYPE, default='str'): vol.In(["str", "int"]), 
     }
 
 
@@ -75,7 +73,6 @@ class LocaltuyaFan(LocalTuyaEntity, FanEntity):
         )
         self._ordered_list = self._config.get(CONF_FAN_ORDERED_LIST).split(",")
         self._ordered_list_mode = None
-        self._dps_type = int if self._config.get(CONF_FAN_DPS_TYPE) == "int" else str
 
         if isinstance(self._ordered_list, list) and len(self._ordered_list) > 1:
             self._use_ordered_list = True
@@ -141,7 +138,7 @@ class LocaltuyaFan(LocalTuyaEntity, FanEntity):
                 await self.async_turn_on()
             if self._use_ordered_list:
                 await self._device.set_dp(
-                    self._dps_type(
+                    str(
                         percentage_to_ordered_list_item(self._ordered_list, percentage)
                     ),
                     self._config.get(CONF_FAN_SPEED_CONTROL),
@@ -154,7 +151,7 @@ class LocaltuyaFan(LocalTuyaEntity, FanEntity):
 
             else:
                 await self._device.set_dp(
-                    self._dps_type(
+                    str(
                         math.ceil(
                             percentage_to_ranged_value(self._speed_range, percentage)
                         )
@@ -224,7 +221,7 @@ class LocaltuyaFan(LocalTuyaEntity, FanEntity):
             )
             if current_speed is not None:
                 self._percentage = ordered_list_item_to_percentage(
-                    self._ordered_list, str(current_speed)
+                    self._ordered_list, current_speed
                 )
 
         else:
