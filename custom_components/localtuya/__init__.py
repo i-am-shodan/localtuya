@@ -139,10 +139,8 @@ async def async_setup(hass: HomeAssistant, config: dict):
             )
             new_data[ATTR_UPDATED_AT] = str(int(time.time() * 1000))
             hass.config_entries.async_update_entry(entry, data=new_data)
-            device = hass.data[DOMAIN][TUYA_DEVICES][device_id]
-            if not device.connected:
-                device.async_connect()
-        elif device_id in hass.data[DOMAIN][TUYA_DEVICES]:
+
+        if device_id in hass.data[DOMAIN][TUYA_DEVICES]:
             # _LOGGER.debug("Device %s found with IP %s", device_id, device_ip)
 
             device = hass.data[DOMAIN][TUYA_DEVICES][device_id]
@@ -231,6 +229,9 @@ async def async_migrate_entry(hass, config_entry: ConfigEntry):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up LocalTuya integration from a config entry."""
+    unsub_listener = entry.add_update_listener(update_listener)
+    hass.data[DOMAIN][UNSUB_LISTENER] = unsub_listener
+    hass.data[DOMAIN][TUYA_DEVICES] = {}
     if entry.version < ENTRIES_VERSION:
         _LOGGER.debug(
             "Skipping setup for entry %s since its version (%s) is old",
